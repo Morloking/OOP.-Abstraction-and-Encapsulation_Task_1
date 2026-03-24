@@ -28,7 +28,7 @@ void readAndWrite() {
 	int amountOfAddresses{ 0 };
 
 	std::ifstream fileIn("in.txt");
-	if (!fileIn.is_open()) throw std::runtime_error("Не удалось открыть файл для чтения.\n");
+	if (!fileIn.is_open()) throw std::runtime_error("РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РєСЂС‹С‚СЊ С„Р°Р№Р» РґР»СЏ С‡С‚РµРЅРёСЏ.\n");
 	fileIn >> amountOfAddresses;
 	Address** allAddr = new Address*[amountOfAddresses];
 
@@ -40,7 +40,7 @@ void readAndWrite() {
 	}
 
 	std::ofstream fileOut("out.txt");
-	if (!fileOut.is_open()) throw std::runtime_error("Не удалось открыть файл для записи.\n");
+	if (!fileOut.is_open()) throw std::runtime_error("РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РєСЂС‹С‚СЊ С„Р°Р№Р» РґР»СЏ Р·Р°РїРёСЃРё.\n");
 	fileOut << amountOfAddresses << "\n";
 	for (int i = amountOfAddresses-1; i >= 0; --i) {
 		fileOut << allAddr[i]->getFormatAddress() << "\n";

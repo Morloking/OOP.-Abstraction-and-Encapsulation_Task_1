@@ -10,7 +10,8 @@ public:
 		street(street),
 		home(home),
 		apart(apart)
-	{}
+	{
+	}
 
 	std::string getFormatAddress() {
 		std::string finalStr{ "" };
@@ -25,32 +26,47 @@ private:
 };
 
 void readAndWrite() {
-	int amountOfAddresses{ 0 };
+	int amountOfAddresses{ 0 }, successCreated{ 0 };//добавил счетчик success created
 
 	std::ifstream fileIn("in.txt");
 	if (!fileIn.is_open()) throw std::runtime_error("Не удалось открыть файл для чтения.\n");
 	fileIn >> amountOfAddresses;
-	Address** allAddr = new Address*[amountOfAddresses];
+	Address** allAddr = nullptr;					//объявил заранее, чтобы использовать в блоке трай кэтч + обнулил
 
-	for (int i = 0; i < amountOfAddresses; ++i) {
-		std::string city{""}, street{ "" };
-		int home{ 0 }, apart{ 0 };
-		fileIn >> city >> street >> home >> apart;
-		allAddr[i] = new Address(city, street, home, apart);
-	}
 
-	std::ofstream fileOut("out.txt");
-	if (!fileOut.is_open()) throw std::runtime_error("Не удалось открыть файл для записи.\n");
-	fileOut << amountOfAddresses << "\n";
-	for (int i = amountOfAddresses-1; i >= 0; --i) {
-		fileOut << allAddr[i]->getFormatAddress() << "\n";
+	try {											//добавил трай кэтч прямо в области видимости, чтобы в случае выбрасывания исключения не было утечки памяти
+		allAddr = new Address* [amountOfAddresses];
+
+		for (int i = 0; i < amountOfAddresses; ++i) {
+			std::string city{ "" }, street{ "" };
+			int home{ 0 }, apart{ 0 };
+			fileIn >> city >> street >> home >> apart;
+			allAddr[i] = new Address(city, street, home, apart);
+			++successCreated;						//увеличил счетчик
+		}
+
+		std::ofstream fileOut("out.txt");
+		if (!fileOut.is_open()) throw std::runtime_error("Не удалось открыть файл для записи.\n");
+		fileOut << amountOfAddresses << "\n";
+		for (int i = amountOfAddresses - 1; i >= 0; --i) {
+			fileOut << allAddr[i]->getFormatAddress() << "\n";
+		}
 	}
-	
-	for (int i = 0; i < amountOfAddresses; ++i) {
+	catch (...) {									//удаление в случае выброса исключения
+		for (int i = 0; i < successCreated; ++i) {
+			delete allAddr[i];
+			
+		}
+		delete[] allAddr;
+		throw;
+	}
+	for (int i = 0; i < amountOfAddresses; ++i) {	//удаление стандартное после того, как все отработало
 		delete allAddr[i];
 	}
 	delete[] allAddr;
 }
+
+
 
 int main() {
 	setlocale(LC_ALL, "RUSSIAN");
